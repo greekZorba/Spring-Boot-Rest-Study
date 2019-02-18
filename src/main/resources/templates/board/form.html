@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Board Form</title>
+    <link rel="stylesheet" th:href="@{/css/base.css}" />
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
+</head>
+<body>
+
+    <div th:replace="layout/header::header"></div>
+
+    <div class="container">
+        <div class="page-header">
+            <h1>게시글 등록</h1>
+        </div>
+        <br/>
+        <input id="board_idx" type="hidden" th:value="${board?.idx}"/>
+        <table class="table">
+
+            
+        </table>
+    </div>
+
+
+</body>
+</html>
