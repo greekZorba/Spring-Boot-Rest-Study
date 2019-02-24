@@ -32,8 +32,8 @@
             <tr>
                 <th style="padding:13px 0 0 15px;">생성 날짜</th>
                 <td><input type="text" class="col-md-1 form-control input-sm" readonly="readonly"
-                        th:value="${board?.createdDate} ? ${#temporals.format(borad.createdDate, 'yyyy-MM-dd HH:mm')} :
-                            ${board?.createdDate}"/>
+                           th:value="${board?.createdDate} ? ${#temporals.format(board.createdDate, 'yyyy-MM-dd HH:mm')}
+                           : ${board?.createdDate}"/>
                 </td>
             </tr>
             <tr>
@@ -60,9 +60,12 @@
         </div>
         <div class="pull-right">
             <button th:if="!${board?.idx}" type="button" class="btn btn-primary" id="insert">저장</button>
+            <button th:if="!${board?.idx}" type="button" class="btn btn-info" id="update">수정</button>
+            <button th:if="!${board?.idx}" type="button" class="btn btn-danger" id="delete">삭제</button>
         </div>
     </div>
 
+    <div th:replace="layout/footer::footer"></div>
 
 </body>
 </html>
