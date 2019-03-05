@@ -5,6 +5,9 @@ import com.web.domain.User;
 import com.web.domain.enums.SocialType;
 import com.web.repository.UserRepository;
 import org.springframework.core.MethodParameter;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.stereotype.Component;
@@ -25,7 +28,7 @@ public class UserArgumentResolver implements HandlerMethodArgumentResolver {
 
     private UserRepository userRepository;
 
-    public UserArgumentResolver(UserRepository userRepository){
+    public UserArgumentResolver(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
@@ -38,32 +41,32 @@ public class UserArgumentResolver implements HandlerMethodArgumentResolver {
                                   ModelAndViewContainer mavContainer,
                                   NativeWebRequest webRequest,
                                   WebDataBinderFactory binderFactory) throws Exception {
-        HttpSession session = ((ServletRequestAttributes)RequestContextHolder
+        HttpSession session = ((ServletRequestAttributes) RequestContextHolder
                 .currentRequestAttributes()).getRequest().getSession();
         User user = (User) session.getAttribute("user");
         return getUser(user, session);
     }
 
-    private User getUser(User user, HttpSession session){
-        if(user == null){
-            try{
+    private User getUser(User user, HttpSession session) {
+        if (user == null) {
+            try {
                 OAuth2Authentication authentication = (OAuth2Authentication)
                         SecurityContextHolder.getContext().getAuthentication();
                 Map<String, String> map = (HashMap<String, String>)
                         authentication.getUserAuthentication().getDetails();
                 User convertUser = convertUser(String.valueOf(authentication
-                                                                .getAuthorities()
-                                                                .toArray()[0]), map);
+                        .getAuthorities()
+                        .toArray()[0]), map);
                 user = userRepository.findByEmail(convertUser.getEmail());
 
-                if(user == null){
+                if (user == null) {
                     user = userRepository.save(convertUser);
                 }
 
                 setRoleIfNotSame(user, authentication, map);
                 session.setAttribute("user", user);
 
-            }catch (ClassCastException e){
+            } catch (ClassCastException e) {
                 return user;
             }
         }
@@ -71,22 +74,19 @@ public class UserArgumentResolver implements HandlerMethodArgumentResolver {
         return user;
     }
 
-    private User convertUser(String authority, Map<String, String> map){
-        if(SocialType.FACEBOOK.isEquals(authority)){
+    private User convertUser(String authority, Map<String, String> map) {
+        if (SocialType.FACEBOOK.isEquals(authority)) {
             return getModernUser(SocialType.FACEBOOK, map);
-        }
-        else if(SocialType.GOOGLE.isEquals(authority)){
+        } else if (SocialType.GOOGLE.isEquals(authority)) {
             return getModernUser(SocialType.GOOGLE, map);
-        }
-        else if(SocialType.KAKAO.isEquals(authority)){
-            return getModernUser(SocialType.KAKAO, map);
-        }
-        else{
+        } else if (SocialType.KAKAO.isEquals(authority)) {
+            return getKakaoUser(map);
+        } else {
             return null;
         }
     }
 
-    private User getModernUser(SocialType socialType, Map<String, String> map){
+    private User getModernUser(SocialType socialType, Map<String, String> map) {
         return User.builder()
                 .name(map.get("name"))
                 .email(map.get("email"))
@@ -95,4 +95,28 @@ public class UserArgumentResolver implements HandlerMethodArgumentResolver {
                 .createdDate(LocalDateTime.now())
                 .build();
     }
+
+    private User getKakaoUser(Map<String, String> map) {
+        HashMap<String, String> propertyMap = (HashMap<String, String>)(Object)map.get("properties");
+
+        return User.builder()
+                .name(propertyMap.get("nickname"))
+                .email(map.get("kaccount_email"))
+                .principal(String.valueOf(map.get("id")))
+                .socialType(SocialType.KAKAO)
+                .createdDate(LocalDateTime.now())
+                .build();
+    }
+
+    private void setRoleIfNotSame(User user, OAuth2Authentication authentication,
+                                  Map<String, String> map){
+        if(!authentication.getAuthorities().contains(new
+                SimpleGrantedAuthority(user.getSocialType().getRoleType()))){
+            SecurityContextHolder.getContext().setAuthentication(new
+                    UsernamePasswordAuthenticationToken(map, "N/A",
+                    AuthorityUtils.createAuthorityList(user.getSocialType().getRoleType())));
+        }
+    }
+
+
 }
