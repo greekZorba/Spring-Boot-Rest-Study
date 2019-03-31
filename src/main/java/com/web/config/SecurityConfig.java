@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.oauth2.client.CommonOAuth2Provider;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
@@ -39,7 +40,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .and()
                 .oauth2Login()
                 .defaultSuccessUrl("/loginSuccess")
-                .failureUrl("loginFailure")
+                .failureUrl("/loginFailure")
             .and()
                 .headers().frameOptions().disable()
             .and()
@@ -81,7 +82,28 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private ClientRegistration getRegistration(OAuth2ClientProperties
               clientProperties, String client) {
+        if ("google".equals(client)) {
+            OAuth2ClientProperties.Registration registration = clientProperties.
+                    getRegistration().get("google");
 
+            return CommonOAuth2Provider.GOOGLE.getBuilder(client)
+                    .clientId(registration.getClientId())
+                    .clientSecret(registration.getClientSecret())
+                    .scope("email", "profile")
+                    .build();
+        }
+
+        if ("facebook".equals(client)) {
+            OAuth2ClientProperties.Registration registration = clientProperties.
+                    getRegistration().get("facebook");
+
+            return CommonOAuth2Provider.FACEBOOK.getBuilder(client)
+                    .clientId(registration.getClientId())
+                    .clientSecret(registration.getClientSecret())
+                    .userInfoUri("https://graph.facebook.com/me?field=id,name,email,link")
+                    .scope("email")
+                    .build();
+        }
         return null;
     }
 }
