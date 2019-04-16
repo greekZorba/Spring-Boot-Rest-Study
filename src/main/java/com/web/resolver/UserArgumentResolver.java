@@ -53,7 +53,7 @@ public class UserArgumentResolver implements HandlerMethodArgumentResolver {
                 OAuth2AuthenticationToken authentication = (OAuth2AuthenticationToken)
                         SecurityContextHolder.getContext().getAuthentication();
 
-                Map<String, Object> map = (HashMap<String, Object>)
+                Map<String, Object> map =
                         authentication.getPrincipal().getAttributes();
 
                 User convertUser = convertUser(authentication.
