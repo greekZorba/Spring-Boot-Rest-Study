@@ -37,8 +37,8 @@ subprojects {
         runtimeOnly 'com.h2database:h2'
         runtime('mysql:mysql-connector-java')
         compileOnly 'org.projectlombok:lombok'
-        testImplementation 'org.springframework.boot:spring-boot-starter-test'
-        testImplementation 'org.springframework.security:spring-security-test'
+        testCompile('org.springframework.boot:spring-boot-starter-test')
+        testCompile('org.springframework.security:spring-security-test')
     }
 }
 
@@ -55,6 +55,7 @@ project(':rest-web') {
         compile('org.springframework.boot:spring-boot-starter-web') {
             exclude module: "jackson-databind"
         }
+        compile('org.springframework.boot:spring-boot-starter-hateoas')
     }
 }
 
