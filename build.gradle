@@ -12,6 +12,7 @@ buildscript {
 
 subprojects {
     apply plugin: 'java'
+    apply plugin: 'eclipse'
     apply plugin: 'org.springframework.boot'
     apply plugin: 'io.spring.dependency-management'
 
@@ -24,21 +25,22 @@ subprojects {
     }
 
     dependencies {
-        compile('org.springframework.security:spring-security-oauth2-client')
-        compile('org.springframework.security:spring-security-oauth2-jose')
+        // compile('org.springframework.security:spring-security-oauth2-client')
+        // compile('org.springframework.security:spring-security-oauth2-jose')
+        implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
         compile('org.springframework.boot:spring-boot-starter-security')
         compile('com.fasterxml.jackson.datatype:jackson-datatype-jsr310')
 
-        implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-        implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
-        implementation 'org.springframework.boot:spring-boot-starter-web'
-
         runtimeOnly 'org.springframework.boot:spring-boot-devtools'
-        runtimeOnly 'com.h2database:h2'
         runtime('mysql:mysql-connector-java')
+        runtimeOnly 'com.h2database:h2'
         compileOnly 'org.projectlombok:lombok'
         testCompile('org.springframework.boot:spring-boot-starter-test')
         testCompile('org.springframework.security:spring-security-test')
+
+//        implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+        // implementation 'org.springframework.boot:spring-boot-starter-web'
+
     }
 }
 
