@@ -7,6 +7,4 @@ import org.springframework.data.rest.core.config.Projection;
 public interface UserOnlyContainName {
 
     String getName();
-
-    String getEmail();
 }

@@ -18,7 +18,7 @@ spring:
           physical-strategy: org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy
 
 server:
-  port: 8081
+    port: 8081
 
 
 
